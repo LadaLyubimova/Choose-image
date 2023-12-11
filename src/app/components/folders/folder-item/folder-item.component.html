@@ -1,0 +1,14 @@
+<div class="folder-buttons">
+<button class="folder">
+  <div *ngIf="hasSubfolders; else noChevrone">
+    (+)
+  </div>
+  <ng-template #noChevrone>
+    <div>(-)</div>
+  </ng-template>
+  <svg class="icon icon-folder">
+    <use xlink:href="/assets/sprites/sprite.svg#icon-folder"></use>
+  </svg>
+  {{folder.name}}
+</button>
+</div>

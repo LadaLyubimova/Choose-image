@@ -6,12 +6,12 @@
         <path id="Vector_2" d="M6 6L18 18" stroke="#282828" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
       <defs>
-        <clipPath id="clip0_3_4380">
+        <clipPath id="clip0_3_4380" >
           <rect width="24" height="24" fill="white"/>
         </clipPath>
       </defs>
     </symbol>
-    <symbol id="icon-folder">
+    <symbol id="icon-folder" width="170%" height="170%" viewBox="0 0 32 32">
       <g id="Icon" clip-path="url(#clip0_243_111)">
         <path id="Vector" d="M4.16667 3.33325H7.5L10 5.83325H15.8333C16.2754 5.83325 16.6993 6.00885 17.0118 6.32141C17.3244 6.63397 17.5 7.05789 17.5 7.49992V14.1666C17.5 14.6086 17.3244 15.0325 17.0118 15.3451C16.6993 15.6577 16.2754 15.8333 15.8333 15.8333H4.16667C3.72464 15.8333 3.30072 15.6577 2.98816 15.3451C2.67559 15.0325 2.5 14.6086 2.5 14.1666V4.99992C2.5 4.55789 2.67559 4.13397 2.98816 3.82141C3.30072 3.50885 3.72464 3.33325 4.16667 3.33325Z" fill="#93C5FD"/>
       </g>
