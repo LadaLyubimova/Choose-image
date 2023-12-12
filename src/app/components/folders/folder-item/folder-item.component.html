@@ -1,14 +1,35 @@
 <div class="folder-buttons">
-<button class="folder">
-  <div *ngIf="hasSubfolders; else noChevrone">
-    (+)
+  <div class="one-folder-button">
+    <button appSelectedSvgRotate appSelectedFolder class="folder" (click)="onSelected(folder)">
+      <div *ngIf="subfolderCheck(folder.items); else noChevrone">
+          <svg class="icon icon-chevron">
+            <use xlink:href="/assets/sprites/sprite.svg#icon-chevron"></use>
+          </svg>
+      </div>
+      <ng-template #noChevrone>
+        <div style="width: 15px; height: 15px;"></div>
+      </ng-template>
+      <svg class="icon icon-folder">
+        <use xlink:href="/assets/sprites/sprite.svg#icon-folder"></use>
+      </svg>
+      {{folder.name}}
+    </button>
+    <div class="subfolders" *ngIf="subfoldersOpen">
+      <div *ngFor="let item of items">
+        <div *ngIf="item.type ==='folder'">
+          <button appSelectedSvgRotate appSelectedFolder class="folder" (click)="onSelected(item)">
+            <div *ngIf="subfolderCheck(item.items); else noChevrone">
+              <svg  class="icon icon-chevron">
+                <use xlink:href="/assets/sprites/sprite.svg#icon-chevron"></use>
+              </svg>
+            </div>
+            <svg class="icon icon-folder">
+              <use xlink:href="/assets/sprites/sprite.svg#icon-folder"></use>
+            </svg>
+            {{item.name}}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
-  <ng-template #noChevrone>
-    <div>(-)</div>
-  </ng-template>
-  <svg class="icon icon-folder">
-    <use xlink:href="/assets/sprites/sprite.svg#icon-folder"></use>
-  </svg>
-  {{folder.name}}
-</button>
 </div>
