@@ -12,7 +12,7 @@
       <svg class="icon icon-folder">
         <use xlink:href="/assets/sprites/sprite.svg#icon-folder"></use>
       </svg>
-      {{folder.name}}
+      {{folder.name}} ({{imageCounter(folder)}})
     </button>
     <div class="subfolders" *ngIf="subfoldersOpen">
       <div *ngFor="let item of items">
@@ -26,7 +26,7 @@
             <svg class="icon icon-folder">
               <use xlink:href="/assets/sprites/sprite.svg#icon-folder"></use>
             </svg>
-            {{item.name}}
+            {{item.name}} ({{imageCounter(item)}})
           </button>
         </div>
       </div>

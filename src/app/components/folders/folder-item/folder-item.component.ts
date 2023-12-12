@@ -21,9 +21,29 @@ export class FolderItemComponent implements OnInit {
   @Input() folder!: Ifolder;
   @Output() folderSelected: EventEmitter<Ifolder> = new EventEmitter<Ifolder>();
   items: Ifolder[] = [];
+  countImage:number = 0;
   subfoldersOpen: boolean = false;
 
   ngOnInit() {
+  }
+
+  imageCounter (folder:Ifolder) {
+    let countImage:number = 0;
+    for (let item of folder.items) {
+      if (item.type === 'image'){
+        countImage++;
+      }
+      else if((item as Ifolder).items)
+      {
+        const itemFolder = item as Ifolder;
+        for (let subItem  of itemFolder.items) {
+          if (subItem.type === 'image'){
+            countImage++;
+          }
+        }
+      }
+    }
+  return countImage;
   }
 
   subfolderCheck(folderItems: any) {
@@ -61,6 +81,7 @@ export class FolderItemComponent implements OnInit {
         // alert('Папка открыта? ' + this.subfoldersOpen);
         this.folderSelected.emit(folder);
         this.items = this.writeItemsInArray(folder);
+        this.imageCounter(folder);
       }
     } else {
       console.log("Error: type not " + typeof (this.folder) + ' type is ' + folder.type)
