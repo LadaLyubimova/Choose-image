@@ -1,4 +1,4 @@
-import {Component, OnInit, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit, Output, EventEmitter, Input} from '@angular/core';
 import {FolderItemComponent} from "./folder-item/folder-item.component";
 import {FoldersService} from "../../folders.service";
 import {Ifolder} from "../../../structure";
@@ -14,7 +14,6 @@ import {NgForOf, NgIf} from "@angular/common";
   ],
   templateUrl: './folders.component.html',
   styleUrl: './folders.component.less',
-  providers: [FoldersService]
 })
 export class FoldersComponent implements OnInit{
   fold!: Ifolder[];

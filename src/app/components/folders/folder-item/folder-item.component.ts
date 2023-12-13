@@ -3,6 +3,7 @@ import {Ifolder, Iimage} from "../../../../structure";
 import {NgForOf, NgIf} from "@angular/common";
 import {SelectedFolderDirective} from "../selected-folder.directive";
 import {SelectedSvgRotateDirective} from "../selected-svg-rotate.directive";
+import {FoldersService} from "../../../folders.service";
 
 
 @Component({
@@ -19,9 +20,7 @@ import {SelectedSvgRotateDirective} from "../selected-svg-rotate.directive";
 })
 export class FolderItemComponent implements OnInit {
   @Input() folder!: Ifolder;
-  @Output() folderSelected: EventEmitter<Ifolder> = new EventEmitter<Ifolder>();
   items: Ifolder[] = [];
-  countImage:number = 0;
   subfoldersOpen: boolean = false;
 
   ngOnInit() {
@@ -66,7 +65,6 @@ export class FolderItemComponent implements OnInit {
       if (item.type === 'folder') {
         if ("items" in item) {
           arr.push({name: item.name, type: item.type, items: item?.items});
-          console.log(arr)
         }
       }
     }
@@ -79,13 +77,14 @@ export class FolderItemComponent implements OnInit {
       if (this.subfolderCheck(folder.items)) {
         this.subfoldersOpen = !this.subfoldersOpen;
         // alert('Папка открыта? ' + this.subfoldersOpen);
-        this.folderSelected.emit(folder);
         this.items = this.writeItemsInArray(folder);
-        this.imageCounter(folder);
       }
     } else {
       console.log("Error: type not " + typeof (this.folder) + ' type is ' + folder.type)
     }
+    this.folderService.folderSelected(folder);
+  }
 
+  constructor(private folderService: FoldersService) {
   }
 }

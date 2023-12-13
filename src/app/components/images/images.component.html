@@ -1,1 +1,4 @@
-<p>images works!</p>
+<p>Имя: {{folder.name}}</p>
+<div class="image-container">
+<app-image-item *ngFor="let image of getImages(folder)" [images]="image"></app-image-item>
+</div>
