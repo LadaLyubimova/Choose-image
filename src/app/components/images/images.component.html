@@ -1,4 +1,12 @@
-<p>Имя: {{folder.name}}</p>
-<div class="image-container">
-<app-image-item *ngFor="let image of getImages(folder)" [images]="image"></app-image-item>
+<div *ngIf="getImages(folder).length > 0; else emptyFolder" class="image-container">
+<app-image-item  *ngFor="let image of getImages(folder)" [images]="image"></app-image-item>
 </div>
+<ng-template #emptyFolder>
+  <div class="folder-empty" style="">
+    <svg style="width: 140px" class="icon">
+      <use xlink:href="/assets/sprites/sprite.svg#icon-folder"></use>
+    </svg>
+    <p>This folder is empty</p>
+  </div>
+
+</ng-template>

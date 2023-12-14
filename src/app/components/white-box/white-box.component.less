@@ -50,9 +50,10 @@
 .insert-button {
   background: #E0E0E0;
   border-radius: 8px;
-  border: none;
   padding: 8px 16px;
   color: #B2B2B2;
+  border: 2px solid transparent;
+  cursor: not-allowed;;
 }
 
 .svg-cross {
@@ -70,3 +71,34 @@ p{
   stroke: currentColor;
   fill: currentColor;
 }
+
+.able {
+  background: #2450FF;
+  color: #FFFFFF;
+  cursor: pointer;
+}
+
+.able:hover {
+  background: #1D4ED8;
+}
+
+.able:focus {
+  border: #282828 2px solid;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.20);
+  border-radius: 4px;
+}
+

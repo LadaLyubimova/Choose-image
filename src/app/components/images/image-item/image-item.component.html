@@ -1,7 +1,6 @@
 <div class="image-block">
-  <button class="image-button">
+  <button appSelectedImage (click)="imageWasSelect(images)" id="image-button" #imageButton  class="image-button">
     <img class="image" alt="{{images.name}}" src="{{images.url}}">
   </button>
   {{images.name}}
 </div>
-
