@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {ElementRef, Injectable} from '@angular/core';
 import {Ifolder} from "../structure";
 import {BehaviorSubject} from 'rxjs';
 
@@ -14,6 +14,7 @@ export class FoldersService {
   private selectedFolderSubject = new BehaviorSubject<Ifolder>({name: '',type: '', items:[]});
   selectedFolder$ = this.selectedFolderSubject.asObservable();
   currentFolder:Ifolder = {name: this.selectedFolderSubject.value.name,type: '', items:[]};
+  clickedElement!:HTMLElement;
 
   folderSelected(folder:Ifolder){
     this.selectedFolderSubject.next(folder);
@@ -164,6 +165,41 @@ export class FoldersService {
           name: "Cats",
           type: "folder",
           items: [
+            {name: "Animals",
+              type: "folder",
+              items: [
+                {
+                  name: "Cat_1",
+                  type: "image",
+                  url: "/assets/media/images/cats/cat_1.png",
+                },
+                {
+                  name: "cat_2",
+                  type: "image",
+                  url: "/assets/media/images/cats/cat_2.png"
+                },
+                {
+                  name: "Cat_1",
+                  type: "image",
+                  url: "/assets/media/images/cats/cat_1.png",
+                },
+                {
+                  name: "cat_2",
+                  type: "image",
+                  url: "/assets/media/images/cats/cat_9.png"
+                },
+                {
+                  name: "Cat_1",
+                  type: "image",
+                  url: "/assets/media/images/cats/cat_5.png",
+                },
+                {
+                  name: "cat_2",
+                  type: "image",
+                  url: "/assets/media/images/cats/cat_7.png"
+                }
+              ]
+            },
             {
               name: "Cat_1",
               type: "image",

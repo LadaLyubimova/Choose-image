@@ -1,5 +1,5 @@
 <div class="image-block">
-  <button appSelectedImage (click)="imageWasSelect(images)" id="image-button" #imageButton  class="image-button">
+  <button appSelectedImage (click)="imageWasSelect(images, $event)" id="image-button" #imageButton  class="image-button">
     <img class="image" alt="{{images.name}}" src="{{images.url}}">
   </button>
   {{images.name}}

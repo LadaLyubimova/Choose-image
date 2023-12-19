@@ -20,19 +20,14 @@ export class ImagesComponent implements OnDestroy {
   folder: Ifolder = {name: '', type: '', items: []};
   private folderSubscription!: Subscription;
 
-  getImages(folder: Ifolder) {
-    let images: any[] = [];
+  getImages(folder: Ifolder, currentImages: any[] = []) {
+    let images = currentImages;
     for (let item of folder.items) {
       if (item.type === 'image') {
         images.push(item);
       }
-      else if (item.type === 'folder') {
-        const itemFolder = item as Ifolder;
-        for (let subItem  of itemFolder.items) {
-          if (subItem.type === 'image'){
-            images.push(subItem);
-          }
-        }
+      else {
+        this.getImages(item as Ifolder, images)
       }
     }
     return images;

@@ -26,7 +26,7 @@ export class ImageItemComponent{
   @ViewChild('imageButton') imageButton!: ElementRef;
   imageSelect: boolean = false;
 
-  imageWasSelect(image:Iimage) {
+  imageWasSelect(image:Iimage, event: Event) {
     this.ImagesService.imageSelected(image);
     this.imageSelect = true;
     this.ImagesService.setImageSelect(this.imageSelect);

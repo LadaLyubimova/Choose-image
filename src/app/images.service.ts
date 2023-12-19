@@ -10,12 +10,14 @@ export class ImagesService {
   selectedItem$ = this.selectedItemSubject.asObservable();
   private selectedImageSubject = new BehaviorSubject<boolean>(false);
   selectedImage$ = this.selectedImageSubject.asObservable();
+  clickedElement!:HTMLElement;
 
   imageSelected(image:Iimage){
     this.selectedItemSubject.next(image);
   }
 
   setImageSelect(bool:boolean) {
+    // console.log(bool);
     this.selectedImageSubject.next(bool);
   }
 
