@@ -19,7 +19,7 @@
   </div>
 
   <div class="bottom-block">
-    <button [disabled]="!imageSelect" [ngClass]="{able: imageSelect}" class="insert-button">
+    <button [disabled]="!imageSelect" [ngClass]="{able: imageSelect}" (click)="onInsert()" class="insert-button">
       Insert
     </button>
   </div>

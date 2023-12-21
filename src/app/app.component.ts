@@ -13,21 +13,7 @@ import {ImagesService} from "./images.service";
 })
 export class AppComponent {
   title = 'Choose-image';
-
-  @HostListener('document:click', ['$event']) click(event:Event) {
-    const targetElement = event.target as HTMLElement;
-    if (targetElement.classList.contains('image')) {
-      // console.log('Это картинка!');
-      this.imgService.setImageSelect(true);
-    }
-    else {
-      this.imgService.setImageSelect(false);
-      // console.log('Это не картинка!');
-    }
-
-  };
-
-  constructor(private imgService:ImagesService) {
+  constructor() {
   }
 
 }

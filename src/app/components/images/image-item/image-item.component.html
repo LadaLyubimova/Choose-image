@@ -1,6 +1,6 @@
 <div class="image-block">
-  <button appSelectedImage (click)="imageWasSelect(images, $event)" id="image-button" #imageButton  class="image-button">
-    <img class="image" alt="{{images.name}}" src="{{images.url}}">
+  <button [ngClass]="{'select-image':imageSelect}" (click)="imageWasSelect(image, $event)" id="image-button" #imageButton  class="image-button">
+    <img class="image" alt="{{image.name}}" src="{{image.url}}">
   </button>
-  {{images.name}}
+  {{image.name}}
 </div>

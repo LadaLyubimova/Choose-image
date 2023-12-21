@@ -32,4 +32,13 @@ export class WhiteBoxComponent {
       this.imageSelect = value;
     });
   }
+
+  onInsert() {
+    if (this.imageSelect) {
+      alert('Image: ' + this.image.name);
+    }
+    else {
+      alert('Image not selected')
+    }
+  }
 }
