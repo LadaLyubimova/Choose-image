@@ -21,7 +21,7 @@ import {FoldersService} from "../../../folders.service";
 export class FolderItemComponent implements OnInit {
   @Input() folder!: Ifolder;
   items: Ifolder[] = [];
-  subfoldersOpen: boolean = false;
+  subFoldersOpen: boolean = false;
   private countImage: number = 0;
 
 
@@ -30,61 +30,80 @@ export class FolderItemComponent implements OnInit {
 
   imageCounter(folder: Ifolder, currentCount: number = 0): number {
     this.countImage = currentCount;
-
     for (let item of folder.items) {
-      if (item.type === 'image') {
-        this.countImage++;
-      } else {
-        this.imageCounter(item as Ifolder, this.countImage);
+        if (item.type === 'image') {
+          this.countImage++;
+        } else {
+          this.imageCounter(item as unknown as Ifolder, this.countImage);
+        }
       }
+    for (let index of folder.subFolders) {
+      this.imageCounter(this.folderService.getFolderById(index), this.countImage)
     }
+
+
+    // for (let item of folder.items) {
+    //   if (item.type === 'image') {
+    //     this.countImage++;
+    //   } else {
+    //     this.imageCounter(item as unknown as Ifolder, this.countImage);
+    //   }
+    // }
 
     return this.countImage;
   }
 
-  subfolderCheck(folderItems: any) {
-    if (typeof (folderItems) === "object") {
+  subfolderCheck(folder:Ifolder) {
+    if (folder.subFolders.length >= 1){
+      return true;
     }
-    for (let item of folderItems) {
-      if (item.type === 'folder') {
-        // console.log('Имя подпапки ' + item.name + ' Итерация: ' + this.i)
-        return true;
-      } else {
-        return false;
-      }
+    else {
+      return false;
     }
-    return false;
+
+    // if (typeof (folderItems) === "object") {
+    // }
+    // for (let item of folderItems) {
+    //   if (item.type === 'folder') {
+    //     // console.log('Имя подпапки ' + item.name + ' Итерация: ' + this.i)
+    //     return true;
+    //   } else {
+    //     return false;
+    //   }
+    // }
+    // return false;
   }
 
   writeItemsInArray(folder: Ifolder) {
     let arr: Ifolder[] = [];
-    for (let item of folder.items) {
-      if (item.type === 'folder') {
-        if ("items" in item) {
-          arr.push({name: item.name, type: item.type, items: item?.items});
-        }
-      }
+    for (let index of folder.subFolders) {
+      arr.push(this.folderService.getFolderById(index));
     }
     return arr;
+
+    // let arr: Ifolder[] = [];
+    // for (let item of folder.items) {
+    //   if (item.type === 'folder') {
+    //     const folderItem = item as unknown as Ifolder;
+    //       arr.push({name: folderItem.name, type: folderItem.type, items: folderItem.items, subFolders: folderItem.subFolders, id: folderItem.id});
+    //   }
+    // }
+    // return arr;
   }
 
 
   onSelected(folder: Ifolder,event: Event) {
     if (this.folderService.clickedElement){
-      // console.log('Существует');
       this.folderService.clickedElement.classList.remove('select');
     }
     this.folderService.clickedElement = event.target as HTMLElement;
     this.folderService.clickedElement.classList.add('select');
-    // console.log(folder);
     if (folder.type === 'folder') {
-      if (folder.items) {
-        if (this.subfolderCheck(folder.items)) {
-          this.subfoldersOpen = !this.subfoldersOpen;
-          // alert('Папка открыта? ' + this.subfoldersOpen);
+        if (this.subfolderCheck(folder)) {
+          this.subFoldersOpen = !this.subFoldersOpen;
+          // alert('Папка открыта? ' + this.subFoldersOpen);
           this.items = this.writeItemsInArray(folder);
         }
-      }
     } else {
       console.log("Error: type not " + typeof (this.folder) + ' type is ' + folder.type)
     }

@@ -6,7 +6,9 @@
 
 
 export interface Ifolder {
+  id: string;
   name: string;
   type: string;
-  items: (Ifolder | Iimage)[];
+  items: Iimage[];
+  subFolders: string[]
 }

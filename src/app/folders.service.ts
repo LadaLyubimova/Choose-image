@@ -1,6 +1,7 @@
 import {ElementRef, Injectable} from '@angular/core';
 import {Ifolder} from "../structure";
 import {BehaviorSubject} from 'rxjs';
+import {error} from "@angular/compiler-cli/src/transformers/util";
 
 
 @Injectable({
@@ -11,24 +12,51 @@ export class FoldersService {
   constructor() {
   }
 
-  private selectedFolderSubject = new BehaviorSubject<Ifolder>({name: '',type: '', items:[]});
+  private selectedFolderSubject = new BehaviorSubject<Ifolder>({id: '1', subFolders: [], name: '', type: '', items: []});
   selectedFolder$ = this.selectedFolderSubject.asObservable();
-  currentFolder:Ifolder = {name: this.selectedFolderSubject.value.name,type: '', items:[]};
-  clickedElement!:HTMLElement;
+  currentFolder: Ifolder = {id: this.selectedFolderSubject.value.id, subFolders: [], name: this.selectedFolderSubject.value.name, type: '', items: []};
+  clickedElement!: HTMLElement;
 
-  folderSelected(folder:Ifolder){
+  folderSelected(folder: Ifolder) {
     this.selectedFolderSubject.next(folder);
     this.currentFolder = folder;
   }
 
   getFolders() {
-    return this.folders.slice();
+    let fold:Ifolder = this.getFolderById('root');
+    let arrFolders:Ifolder[] = [];
+    fold.subFolders.forEach((folder, index) =>
+      {
+        arrFolders.push(this.getFolderById(folder));
+      }
+    );
+    return arrFolders;
   }
+
+  getFolderById(id:string) {
+  let folder: Ifolder = {id: '', name: '', subFolders: [], items: [], type: 'folder'};
+    for (let fold of this.folders){
+      if(fold.id === id) {
+        folder = fold;
+      }
+    }
+    return folder;
+  }
+
 
   private folders: Ifolder[] = [
     {
+      id: 'root',
+      name: 'root',
+      type: 'folder',
+      subFolders: ['1','5','6','9','10','11'],
+      items: []
+    },
+    {
+      id: '1',
       name: "Abstract",
       type: "folder",
+      subFolders: [],
       items: [
         {
           name: "Abstract_1",
@@ -158,292 +186,309 @@ export class FoldersService {
       ],
     },
     {
+      id: '2',
+      subFolders: ['3'],
+      name: "Cats",
+      type: "folder",
+      items: [
+        {
+          name: "Cat_1",
+          type: "image",
+          url: "/assets/media/images/cats/cat_1.png",
+        },
+        {
+          name: "cat_2",
+          type: "image",
+          url: "/assets/media/images/cats/cat_2.png"
+        },
+        {
+          name: "cat_3",
+          type: "image",
+          url: "/assets/media/images/cats/cat_3.png"
+        },
+        {
+          name: "cat_4",
+          type: "image",
+          url: "/assets/media/images/cats/cat_4.png"
+        },
+        {
+          name: "cat_5",
+          type: "image",
+          url: "/assets/media/images/cats/cat_5.png"
+        },
+        {
+          name: "cat_6",
+          type: "image",
+          url: "/assets/media/images/cats/cat_6.png"
+        },
+        {
+          name: "cat_7",
+          type: "image",
+          url: "/assets/media/images/cats/cat_7.png"
+        },
+        {
+          name: "cat_8",
+          type: "image",
+          url: "/assets/media/images/cats/cat_8.png"
+        },
+        {
+          name: "cat_9",
+          type: "image",
+          url: "/assets/media/images/cats/cat_9.png"
+        },
+        {
+          name: "cat_10",
+          type: "image",
+          url: "/assets/media/images/cats/cat_10.png"
+        },
+        {
+          name: "cat_11",
+          type: "image",
+          url: "/assets/media/images/cats/cat_11.png"
+        },
+        {
+          name: "cat_12",
+          type: "image",
+          url: "/assets/media/images/cats/cat_12.png"
+        },
+        {
+          name: "cat_13",
+          type: "image",
+          url: "/assets/media/images/cats/cat_13.png"
+        },
+        {
+          name: "cat_14",
+          type: "image",
+          url: "/assets/media/images/cats/cat_14.png"
+        },
+        {
+          name: "cat_15",
+          type: "image",
+          url: "/assets/media/images/cats/cat_15.png"
+        }
+      ]
+    },
+    {
+      id: '3',
+      subFolders: [],
       name: "Animals",
       type: "folder",
       items: [
         {
-          name: "Cats",
-          type: "folder",
-          items: [
-            {name: "Animals",
-              type: "folder",
-              items: [
-                {
-                  name: "Cat_1",
-                  type: "image",
-                  url: "/assets/media/images/cats/cat_1.png",
-                },
-                {
-                  name: "cat_2",
-                  type: "image",
-                  url: "/assets/media/images/cats/cat_2.png"
-                },
-                {
-                  name: "Cat_1",
-                  type: "image",
-                  url: "/assets/media/images/cats/cat_1.png",
-                },
-                {
-                  name: "cat_2",
-                  type: "image",
-                  url: "/assets/media/images/cats/cat_9.png"
-                },
-                {
-                  name: "Cat_1",
-                  type: "image",
-                  url: "/assets/media/images/cats/cat_5.png",
-                },
-                {
-                  name: "cat_2",
-                  type: "image",
-                  url: "/assets/media/images/cats/cat_7.png"
-                }
-              ]
-            },
-            {
-              name: "Cat_1",
-              type: "image",
-              url: "/assets/media/images/cats/cat_1.png",
-            },
-            {
-              name: "cat_2",
-              type: "image",
-              url: "/assets/media/images/cats/cat_2.png"
-            },
-            {
-              name: "cat_3",
-              type: "image",
-              url: "/assets/media/images/cats/cat_3.png"
-            },
-            {
-              name: "cat_4",
-              type: "image",
-              url: "/assets/media/images/cats/cat_4.png"
-            },
-            {
-              name: "cat_5",
-              type: "image",
-              url: "/assets/media/images/cats/cat_5.png"
-            },
-            {
-              name: "cat_6",
-              type: "image",
-              url: "/assets/media/images/cats/cat_6.png"
-            },
-            {
-              name: "cat_7",
-              type: "image",
-              url: "/assets/media/images/cats/cat_7.png"
-            },
-            {
-              name: "cat_8",
-              type: "image",
-              url: "/assets/media/images/cats/cat_8.png"
-            },
-            {
-              name: "cat_9",
-              type: "image",
-              url: "/assets/media/images/cats/cat_9.png"
-            },
-            {
-              name: "cat_10",
-              type: "image",
-              url: "/assets/media/images/cats/cat_10.png"
-            },
-            {
-              name: "cat_11",
-              type: "image",
-              url: "/assets/media/images/cats/cat_11.png"
-            },
-            {
-              name: "cat_12",
-              type: "image",
-              url: "/assets/media/images/cats/cat_12.png"
-            },
-            {
-              name: "cat_13",
-              type: "image",
-              url: "/assets/media/images/cats/cat_13.png"
-            },
-            {
-              name: "cat_14",
-              type: "image",
-              url: "/assets/media/images/cats/cat_14.png"
-            },
-            {
-              name: "cat_15",
-              type: "image",
-              url: "/assets/media/images/cats/cat_15.png"
-            }
-          ]
+          name: "Cat_1",
+          type: "image",
+          url: "/assets/media/images/cats/cat_1.png",
         },
         {
-          name: "Dogs",
-          type: "folder",
-          items: [
-            {
-              name: "Dog_1",
-              type: "image",
-              url: "/assets/media/images/dogs/Dog_1.png",
-            },
-            {
-              name: "Dog_2",
-              type: "image",
-              url: "/assets/media/images/dogs/Dog_2.png"
-            },
-            {
-              name: "Dog_3",
-              type: "image",
-              url: "/assets/media/images/dogs/Dog_3.png"
-            },
-            {
-              name: "Dog_4",
-              type: "image",
-              url: "/assets/media/images/dogs/Dog_4.png"
-            },
-            {
-              name: "Dog_5",
-              type: "image",
-              url: "/assets/media/images/dogs/Dog_5.png"
-            }
-          ],
+          name: "cat_2",
+          type: "image",
+          url: "/assets/media/images/cats/cat_2.png"
         },
-      ],
+        {
+          name: "Cat_1",
+          type: "image",
+          url: "/assets/media/images/cats/cat_1.png",
+        },
+        {
+          name: "cat_2",
+          type: "image",
+          url: "/assets/media/images/cats/cat_9.png"
+        },
+        {
+          name: "Cat_1",
+          type: "image",
+          url: "/assets/media/images/cats/cat_5.png",
+        },
+        {
+          name: "cat_2",
+          type: "image",
+          url: "/assets/media/images/cats/cat_7.png"
+        }
+      ]
     },
     {
-      name: "Food",
+      id: '4',
+      subFolders: [],
+      name: "Dogs",
       type: "folder",
       items: [
         {
-          name: "Sweet",
-          type: "folder",
-          items: [
-            {
-              name: "Sweet_1",
-              type: "image",
-              url: "/assets/media/images/sweets/Sweet_1.png",
-            },
-            {
-              name: "Sweet_2",
-              type: "image",
-              url: "/assets/media/images/sweets/Sweet_2.png"
-            },
-            {
-              name: "Sweet_3",
-              type: "image",
-              url: "/assets/media/images/sweets/Sweet_3.png"
-            },
-            {
-              name: "Sweet_4",
-              type: "image",
-              url: "/assets/media/images/sweets/Sweet_4.png"
-            },
-            {
-              name: "Sweet_5",
-              type: "image",
-              url: "/assets/media/images/sweets/Sweet_5.png"
-            },
-            {
-              name: "Sweet_6",
-              type: "image",
-              url: "/assets/media/images/sweets/Sweet_6.png"
-            },
-            {
-              name: "Sweet_7",
-              type: "image",
-              url: "/assets/media/images/sweets/Sweet_7.png"
-            },
-            {
-              name: "Sweet_8",
-              type: "image",
-              url: "/assets/media/images/sweets/Sweet_8.png"
-            },
-            {
-              name: "Sweet_9",
-              type: "image",
-              url: "/assets/media/images/sweets/Sweet_9.png"
-            },
-            {
-              name: "Sweet_10",
-              type: "image",
-              url: "/assets/media/images/sweets/Sweet_10.png"
-            },
-            {
-              name: "Sweet_11",
-              type: "image",
-              url: "/assets/media/images/sweets/Sweet_11.png"
-            }
-          ],
+          name: "Dog_1",
+          type: "image",
+          url: "/assets/media/images/dogs/Dog_1.png",
         },
         {
-          name: "Not sweet",
-          type: "folder",
-          items: [
-            {
-              name: "Not_sweet_1",
-              type: "image",
-              url: "/assets/media/images/not_sweets/Not_sweet_1.png",
-            },
-            {
-              name: "Not_sweet_2",
-              type: "image",
-              url: "/assets/media/images/not_sweets/Not_sweet_2.png",
-            },
-            {
-              name: "Not_sweet_3",
-              type: "image",
-              url: "/assets/media/images/not_sweets/Not_sweet_3.png",
-            },
-            {
-              name: "Not_sweet_4",
-              type: "image",
-              url: "/assets/media/images/not_sweets/Not_sweet_4.png",
-            },
-            {
-              name: "Not_sweet_5",
-              type: "image",
-              url: "/assets/media/images/not_sweets/Not_sweet_5.png",
-            },
-            {
-              name: "Not_sweet_6",
-              type: "image",
-              url: "/assets/media/images/not_sweets/Not_sweet_6.png",
-            },
-            {
-              name: "Not_sweet_7",
-              type: "image",
-              url: "/assets/media/images/not_sweets/Not_sweet_7.png",
-            },
-            {
-              name: "Not_sweet_8",
-              type: "image",
-              url: "/assets/media/images/not_sweets/Not_sweet_8.png",
-            },
-            {
-              name: "Not_sweet_9",
-              type: "image",
-              url: "/assets/media/images/not_sweets/Not_sweet_9.png",
-            },
-            {
-              name: "Not_sweet_10",
-              type: "image",
-              url: "/assets/media/images/not_sweets/Not_sweet_10.png",
-            },
-            {
-              name: "Not_sweet_11",
-              type: "image",
-              url: "/assets/media/images/not_sweets/Not_sweet_11.png",
-            },
-          ],
+          name: "Dog_2",
+          type: "image",
+          url: "/assets/media/images/dogs/Dog_2.png"
+        },
+        {
+          name: "Dog_3",
+          type: "image",
+          url: "/assets/media/images/dogs/Dog_3.png"
+        },
+        {
+          name: "Dog_4",
+          type: "image",
+          url: "/assets/media/images/dogs/Dog_4.png"
+        },
+        {
+          name: "Dog_5",
+          type: "image",
+          url: "/assets/media/images/dogs/Dog_5.png"
+        }
+      ]
+    },
+    {
+      id: '5',
+      subFolders: ['4', '2'],
+      name: "Animals",
+      type: "folder",
+      items: [],
+    },
+    {
+      id: '6',
+      subFolders: ['7','8'],
+      name: "Food",
+      type: "folder",
+      items: [],
+    },
+    {
+      id: '7',
+      subFolders: [],
+      name: "Sweet",
+      type: "folder",
+      items: [
+        {
+          name: "Sweet_1",
+          type: "image",
+          url: "/assets/media/images/sweets/Sweet_1.png",
+        },
+        {
+          name: "Sweet_2",
+          type: "image",
+          url: "/assets/media/images/sweets/Sweet_2.png"
+        },
+        {
+          name: "Sweet_3",
+          type: "image",
+          url: "/assets/media/images/sweets/Sweet_3.png"
+        },
+        {
+          name: "Sweet_4",
+          type: "image",
+          url: "/assets/media/images/sweets/Sweet_4.png"
+        },
+        {
+          name: "Sweet_5",
+          type: "image",
+          url: "/assets/media/images/sweets/Sweet_5.png"
+        },
+        {
+          name: "Sweet_6",
+          type: "image",
+          url: "/assets/media/images/sweets/Sweet_6.png"
+        },
+        {
+          name: "Sweet_7",
+          type: "image",
+          url: "/assets/media/images/sweets/Sweet_7.png"
+        },
+        {
+          name: "Sweet_8",
+          type: "image",
+          url: "/assets/media/images/sweets/Sweet_8.png"
+        },
+        {
+          name: "Sweet_9",
+          type: "image",
+          url: "/assets/media/images/sweets/Sweet_9.png"
+        },
+        {
+          name: "Sweet_10",
+          type: "image",
+          url: "/assets/media/images/sweets/Sweet_10.png"
+        },
+        {
+          name: "Sweet_11",
+          type: "image",
+          url: "/assets/media/images/sweets/Sweet_11.png"
+        }
+      ],
+    },
+    {
+      id: '8',
+      subFolders: [],
+      name: "Not sweet",
+      type: "folder",
+      items: [
+        {
+          name: "Not_sweet_1",
+          type: "image",
+          url: "/assets/media/images/not_sweets/Not_sweet_1.png",
+        },
+        {
+          name: "Not_sweet_2",
+          type: "image",
+          url: "/assets/media/images/not_sweets/Not_sweet_2.png",
+        },
+        {
+          name: "Not_sweet_3",
+          type: "image",
+          url: "/assets/media/images/not_sweets/Not_sweet_3.png",
+        },
+        {
+          name: "Not_sweet_4",
+          type: "image",
+          url: "/assets/media/images/not_sweets/Not_sweet_4.png",
+        },
+        {
+          name: "Not_sweet_5",
+          type: "image",
+          url: "/assets/media/images/not_sweets/Not_sweet_5.png",
+        },
+        {
+          name: "Not_sweet_6",
+          type: "image",
+          url: "/assets/media/images/not_sweets/Not_sweet_6.png",
+        },
+        {
+          name: "Not_sweet_7",
+          type: "image",
+          url: "/assets/media/images/not_sweets/Not_sweet_7.png",
+        },
+        {
+          name: "Not_sweet_8",
+          type: "image",
+          url: "/assets/media/images/not_sweets/Not_sweet_8.png",
+        },
+        {
+          name: "Not_sweet_9",
+          type: "image",
+          url: "/assets/media/images/not_sweets/Not_sweet_9.png",
+        },
+        {
+          name: "Not_sweet_10",
+          type: "image",
+          url: "/assets/media/images/not_sweets/Not_sweet_10.png",
+        },
+        {
+          name: "Not_sweet_11",
+          type: "image",
+          url: "/assets/media/images/not_sweets/Not_sweet_11.png",
         },
       ],
     },
     {
+      id: '9',
+      subFolders: [],
       name: "Interiors",
       type: "folder",
       items: [], // Здесь пока нет элементов
     },
     {
+      id: '10',
+      subFolders: [],
       name: "Plants",
       type: "folder",
       items: [
@@ -475,6 +520,8 @@ export class FoldersService {
       ],
     },
     {
+      id: '11',
+      subFolders: [],
       name: "Space",
       type: "folder",
       items: [

@@ -3,7 +3,7 @@
   <div class="one-folder-button">
     <button appSelectedSvgRotate appSelectedFolder (click)="onSelected(folder, $event)" class="folder">
       <div *ngIf="itemsCheck(folder); else noChevrone">
-      <div *ngIf="subfolderCheck(folder.items); else noChevrone">
+      <div *ngIf="subfolderCheck(folder); else noChevrone">
           <svg class="icon icon-chevron">
             <use xlink:href="/assets/sprites/sprite.svg#icon-chevron"></use>
           </svg>
@@ -17,7 +17,7 @@
       </svg>
       {{folder.name}} ({{imageCounter(folder)}})
     </button>
-    <div class="subfolders" *ngIf="subfoldersOpen">
+    <div class="subfolders" *ngIf="subFoldersOpen">
           <app-folder-item *ngFor="let folder of items" [folder]="folder">
           </app-folder-item>
     </div>
