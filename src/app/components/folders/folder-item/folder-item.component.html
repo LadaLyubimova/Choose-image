@@ -1,9 +1,8 @@
-<!--<button  > A</button>-->
 <div class="folder-buttons">
   <div class="one-folder-button">
-    <button appSelectedSvgRotate appSelectedFolder (click)="onSelected(folder, $event)" class="folder">
+    <button appSelectedFolder (click)="onSelected(folder, $event)" class="folder">
       <div *ngIf="itemsCheck(folder); else noChevrone">
-      <div *ngIf="subfolderCheck(folder); else noChevrone">
+      <div appSelectedSvgRotate (click)="subFoldersOpen = !subFoldersOpen;" *ngIf="subfolderCheck(folder); else noChevrone">
           <svg class="icon icon-chevron">
             <use xlink:href="/assets/sprites/sprite.svg#icon-chevron"></use>
           </svg>

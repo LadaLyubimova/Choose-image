@@ -1,5 +1,5 @@
 <div *ngIf="getImages(folder).length > 0; else emptyFolder" class="image-container">
-<app-image-item  *ngFor="let image of getImages(folder)" [image]="image"></app-image-item>
+<app-image-item  *ngFor="let image of images$| async" [image]="image"></app-image-item>
 </div>
 <ng-template #emptyFolder>
   <div class="folder-empty" style="">

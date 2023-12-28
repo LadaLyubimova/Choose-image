@@ -1,9 +1,9 @@
 import {Component, ElementRef, HostListener, OnDestroy} from '@angular/core';
 import {FoldersService} from "../../folders.service";
-import {Ifolder} from "../../../structure";
-import {Subscription} from 'rxjs';
+import {Ifolder, Iimage} from "../../../structure";
+import {map, Observable, Subscription} from 'rxjs';
 import {ImageItemComponent} from "./image-item/image-item.component";
-import {NgForOf, NgIf} from "@angular/common";
+import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {ImagesService} from "../../images.service";
 
 @Component({
@@ -12,15 +12,23 @@ import {ImagesService} from "../../images.service";
   imports: [
     ImageItemComponent,
     NgIf,
-    NgForOf
+    NgForOf,
+    AsyncPipe
   ],
   templateUrl: './images.component.html',
   styleUrl: './images.component.less'
 })
 export class ImagesComponent implements OnDestroy {
   folder: Ifolder = {id: '1', subFolders: [], name: '', type: '', items: []};
+  images$:Observable<Iimage[]> = this.folderService.selectedFolder$.pipe(map(value =>this.getImages(value)))
   private folderSubscription!: Subscription;
-  isSelect:boolean = false;
+
+  constructor( public folderService: FoldersService, private imgService:ImagesService, private elRef: ElementRef,) {
+    this.folderSubscription = this.folderService.selectedFolder$.subscribe((value) => {
+      this.folder = value;
+      this.getImages(this.folder);
+    });
+  }
 
   @HostListener('click', ['$event']) click(event:Event) {
     const targetElement = event.target as HTMLElement;
@@ -35,24 +43,19 @@ export class ImagesComponent implements OnDestroy {
 
   };
 
-  getImages(folder: Ifolder, currentImages: any[] = []) {
+  getImages(folder: Ifolder | null, currentImages: any[] = []) {
     let images = currentImages;
-    for (let item of folder.items) {
+    if (typeof (folder) !== null){
+    for (let item of (folder as Ifolder).items ) {
       if (item.type === 'image') {
         images.push(item);
       }
     }
-    for (let index of folder.subFolders){
+    for (let index of (folder as Ifolder).subFolders){
       this.getImages(this.folderService.getFolderById(index), images)
     }
+    }
     return images;
-  }
-
-  constructor(private folderService: FoldersService, private imgService:ImagesService, private elRef: ElementRef,) {
-    this.folderSubscription = this.folderService.selectedFolder$.subscribe((value) => {
-      this.folder = value;
-      this.getImages(this.folder);
-    });
   }
 
   ngOnDestroy() {

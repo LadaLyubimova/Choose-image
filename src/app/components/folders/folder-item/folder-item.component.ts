@@ -25,6 +25,9 @@ export class FolderItemComponent implements OnInit {
   private countImage: number = 0;
 
 
+  constructor(private folderService: FoldersService, private elRef:ElementRef) {
+  }
+
   ngOnInit() {
   }
 
@@ -74,7 +77,7 @@ export class FolderItemComponent implements OnInit {
     // return false;
   }
 
-  writeItemsInArray(folder: Ifolder) {
+  writeSubFoldersInArray(folder: Ifolder) {
     let arr: Ifolder[] = [];
     for (let index of folder.subFolders) {
       arr.push(this.folderService.getFolderById(index));
@@ -92,29 +95,35 @@ export class FolderItemComponent implements OnInit {
   }
 
 
-  onSelected(folder: Ifolder,event: Event) {
-    if (this.folderService.clickedElement){
-      this.folderService.clickedElement.classList.remove('select');
+  onSelected(folder: Ifolder, event: Event) {
+    //Adding deleting classes
+
+    if ((event.target as HTMLElement).tagName === 'BUTTON'){
+      if (this.folderService.clickedElement) {
+        this.folderService.clickedElement.classList.remove('select');
+      }
+      this.folderService.clickedElement = event.target as HTMLElement;
+      this.folderService.clickedElement.classList.add('select');
     }
-    this.folderService.clickedElement = event.target as HTMLElement;
-    this.folderService.clickedElement.classList.add('select');
+
+    //Opening and closing subfolders and select folder
+
     if (folder.type === 'folder') {
-        if (this.subfolderCheck(folder)) {
-          this.subFoldersOpen = !this.subFoldersOpen;
-          // alert('Папка открыта? ' + this.subFoldersOpen);
-          this.items = this.writeItemsInArray(folder);
-        }
+      if (this.subFoldersOpen) {
+        this.items = this.writeSubFoldersInArray(folder);
+        // alert('Папка открыта? ' + this.subFoldersOpen);
+      }
+      if ((event.target as HTMLElement).tagName === 'BUTTON') {
+        this.folderService.folderSelected(folder);
+      }
     } else {
       console.log("Error: type not " + typeof (this.folder) + ' type is ' + folder.type)
     }
-    this.folderService.folderSelected(folder);
+
   }
 
   itemsCheck(folder: Ifolder){
     return folder.items !== undefined;
 
-  }
-
-  constructor(private folderService: FoldersService, private elRef:ElementRef) {
   }
 }

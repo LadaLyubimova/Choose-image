@@ -30,9 +30,18 @@ export class ImageItemComponent implements OnInit {
   imageSelectSubscription!: Subscription;
   currentImageSubscription!: Subscription;
   currentSelected!: boolean;
+  constructor(private ImagesService: ImagesService) {
+    this.imageSelectSubscription = this.ImagesService.selectedImage$.subscribe((value) => {
+      this.currentSelected = value;
+      this.imageSelect = this.isSelected();
+    });
+    this.currentImageSubscription = this.ImagesService.selectedItem$.subscribe((value) => {
+      this.currentImage = value;
+      this.imageSelect = this.isSelected();
+    });
+  }
 
   ngOnInit() {
-
 
   }
 
@@ -50,18 +59,5 @@ export class ImageItemComponent implements OnInit {
     } else {
       return false;
     }
-  }
-
-  constructor(private ImagesService: ImagesService) {
-    this.imageSelectSubscription = this.ImagesService.selectedImage$.subscribe((value) => {
-      this.currentSelected = value;
-      this.imageSelect = this.isSelected();
-    });
-
-
-    this.currentImageSubscription = this.ImagesService.selectedItem$.subscribe((value) => {
-      this.currentImage = value;
-      this.imageSelect = this.isSelected();
-    });
   }
 }
