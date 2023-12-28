@@ -1,6 +1,11 @@
-<div *ngIf="getImages(folder).length > 0; else emptyFolder" class="image-container">
-<app-image-item  *ngFor="let image of images$| async" [image]="image"></app-image-item>
-</div>
+<!--<div *ngIf="getImages(folder).length > 0; else emptyFolder" class="image-container">-->
+<!--<app-image-item  *ngFor="let image of images$| async" [image]="image"></app-image-item>-->
+<!--</div>-->
+<ng-container *ngIf="images$ | async as images">
+  <div *ngIf="images.length > 0; else emptyFolder" class="image-container">
+    <app-image-item *ngFor="let image of images" [image]="image"></app-image-item>
+  </div>
+</ng-container>
 <ng-template #emptyFolder>
   <div class="folder-empty" style="">
     <svg style="width: 140px" class="icon">
