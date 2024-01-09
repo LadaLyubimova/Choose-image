@@ -15,6 +15,13 @@
   </div>
 
   <div class="center-right-block">
+    <div class="breadcrumbs">
+      <p class="crumb" *ngFor="let crumb of breadcrumbsArr;let i = index" (click)="onSelectCrumb(crumb, $event, i)">{{crumb.name}}
+<!--        <svg class="icon icon-home">-->
+<!--          <use xlink:href="/assets/sprites/sprite.svg#icon-crumbShooter"></use>-->
+<!--        </svg>-->
+      </p>
+    </div>
     <app-images></app-images>
   </div>
 

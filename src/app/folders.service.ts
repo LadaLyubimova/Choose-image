@@ -1,4 +1,4 @@
-import {ElementRef, Injectable} from '@angular/core';
+import {ElementRef, HostListener, Injectable} from '@angular/core';
 import {Ifolder} from "../structure";
 import {BehaviorSubject} from 'rxjs';
 import {error} from "@angular/compiler-cli/src/transformers/util";
@@ -11,15 +11,27 @@ export class FoldersService {
 
   constructor() {
   }
-
+  clickedElement!: HTMLElement;
+  breadcrumbsArr:Ifolder[] = [];
   private selectedFolderSubject = new BehaviorSubject<Ifolder>({id: '1', subFolders: [], name: '', type: '', items: []});
   selectedFolder$ = this.selectedFolderSubject.asObservable();
+  private breadcrumbsArrSubject = new BehaviorSubject<Ifolder[]>(this.breadcrumbsArr);
+  breadcrumbsArr$ = this.breadcrumbsArrSubject.asObservable();
   currentFolder: Ifolder = {id: this.selectedFolderSubject.value.id, subFolders: [], name: this.selectedFolderSubject.value.name, type: '', items: []};
-  clickedElement!: HTMLElement;
 
-  folderSelected(folder: Ifolder) {
+
+  folderSelected(folder: Ifolder,  event: Event) {
     this.selectedFolderSubject.next(folder);
+    this.breadcrumbsArrSubject.next(this.breadcrumbsArr);
     this.currentFolder = folder;
+    if ((event.target as HTMLElement).tagName === 'P' || 'BUTTON'){
+      let el:HTMLElement = document.getElementById(this.currentFolder.id) as HTMLElement;
+      el.classList.add('select');
+      if (this.clickedElement && this.clickedElement !== el) {
+        this.clickedElement.classList.remove('select');
+      }
+      this.clickedElement = el;
+    }
   }
 
   getFolders() {
@@ -42,6 +54,23 @@ export class FoldersService {
     }
     return folder;
   }
+
+  folderBreadcrumbs(level:number, counter:number=0, arr:Ifolder[] = [], folder:Ifolder){
+      for (let fold of this.folders) {
+        for (let subFold of fold.subFolders) {
+          if (subFold === folder.id) {
+            counter ++;
+            arr.push(fold);
+            if (counter < level) {
+            this.folderBreadcrumbs(level, counter, arr, fold)
+            }
+          }
+        }
+      }
+      arr.push(folder);
+      this.breadcrumbsArr = arr.slice(level,arr.length);
+  }
+
 
 
   private folders: Ifolder[] = [

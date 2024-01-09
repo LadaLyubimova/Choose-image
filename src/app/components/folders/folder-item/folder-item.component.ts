@@ -20,6 +20,7 @@ import {FoldersService} from "../../../folders.service";
 })
 export class FolderItemComponent implements OnInit {
   @Input() folder!: Ifolder;
+  @Input() level:number = 0;
   items: Ifolder[] = [];
   subFoldersOpen: boolean = false;
   private countImage: number = 0;
@@ -29,6 +30,7 @@ export class FolderItemComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.level++;
   }
 
   imageCounter(folder: Ifolder, currentCount: number = 0): number {
@@ -36,13 +38,15 @@ export class FolderItemComponent implements OnInit {
     for (let item of folder.items) {
         if (item.type === 'image') {
           this.countImage++;
-        } else {
+        }
+        else {
           this.imageCounter(item as unknown as Ifolder, this.countImage);
         }
       }
     for (let index of folder.subFolders) {
       this.imageCounter(this.folderService.getFolderById(index), this.countImage)
     }
+
 
 
     // for (let item of folder.items) {
@@ -96,15 +100,8 @@ export class FolderItemComponent implements OnInit {
 
 
   onSelected(folder: Ifolder, event: Event) {
+    this.folderService.folderBreadcrumbs(this.level,0,[],folder);
     //Adding deleting classes
-
-    if ((event.target as HTMLElement).tagName === 'BUTTON'){
-      if (this.folderService.clickedElement) {
-        this.folderService.clickedElement.classList.remove('select');
-      }
-      this.folderService.clickedElement = event.target as HTMLElement;
-      this.folderService.clickedElement.classList.add('select');
-    }
 
     //Opening and closing subfolders and select folder
 
@@ -114,7 +111,7 @@ export class FolderItemComponent implements OnInit {
         // alert('Папка открыта? ' + this.subFoldersOpen);
       }
       if ((event.target as HTMLElement).tagName === 'BUTTON') {
-        this.folderService.folderSelected(folder);
+        this.folderService.folderSelected(folder, event);
       }
     } else {
       console.log("Error: type not " + typeof (this.folder) + ' type is ' + folder.type)
