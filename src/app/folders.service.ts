@@ -2,6 +2,7 @@ import {ElementRef, HostListener, Injectable} from '@angular/core';
 import {Ifolder} from "../structure";
 import {BehaviorSubject} from 'rxjs';
 import {error} from "@angular/compiler-cli/src/transformers/util";
+import {ActivatedRoute, Params, Router} from "@angular/router";
 
 
 @Injectable({
@@ -9,7 +10,7 @@ import {error} from "@angular/compiler-cli/src/transformers/util";
 })
 export class FoldersService {
 
-  constructor() {
+  constructor(private router:Router, private activateRoute:ActivatedRoute) {
   }
   clickedElement!: HTMLElement;
   breadcrumbsArr:Ifolder[] = [];
@@ -20,17 +21,27 @@ export class FoldersService {
   currentFolder: Ifolder = {id: this.selectedFolderSubject.value.id, subFolders: [], name: this.selectedFolderSubject.value.name, type: '', items: []};
 
 
-  folderSelected(folder: Ifolder,  event: Event) {
+  folderSelected(folder: Ifolder,  event: Event = new Event(''), level:number) {
+
+    // console.log(queryParams);
+
+    // localStorage.setItem('selectFolder', JSON.stringify(folder));
+    // localStorage.setItem('selectEvent', JSON.stringify(event));
+    // localStorage.setItem('crumbLevel', JSON.stringify(level));
+    this.folderBreadcrumbs(level,0,[],folder);
     this.selectedFolderSubject.next(folder);
     this.breadcrumbsArrSubject.next(this.breadcrumbsArr);
     this.currentFolder = folder;
-    if ((event.target as HTMLElement).tagName === 'P' || 'BUTTON'){
-      let el:HTMLElement = document.getElementById(this.currentFolder.id) as HTMLElement;
-      el.classList.add('select');
-      if (this.clickedElement && this.clickedElement !== el) {
-        this.clickedElement.classList.remove('select');
+
+    if (event.target){
+      if ((event.target as HTMLElement).tagName === 'P' || 'BUTTON') {
+        let el: HTMLElement = document.getElementById(this.currentFolder.id) as HTMLElement;
+        el.classList.add('select');
+        if (this.clickedElement && this.clickedElement !== el) {
+          this.clickedElement.classList.remove('select');
+        }
+        this.clickedElement = el;
       }
-      this.clickedElement = el;
     }
   }
 
@@ -69,6 +80,21 @@ export class FoldersService {
       }
       arr.push(folder);
       this.breadcrumbsArr = arr.slice(level,arr.length);
+  }
+
+  selectCrumb (folder:Ifolder, event: Event = new Event(''), level:number) {
+    let i= 1;
+    for (let crumb of this.breadcrumbsArr ) {
+      if (crumb.id === folder.id){
+        break;
+      }
+      else {
+        i++;
+      }
+    }
+    level = i;
+    this.folderBreadcrumbs(level,0,[],folder);
+    this.folderSelected( folder, event, level);
   }
 
 

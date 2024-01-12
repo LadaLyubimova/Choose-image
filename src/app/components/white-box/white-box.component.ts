@@ -47,18 +47,7 @@ export class WhiteBoxComponent implements OnDestroy{
   }
 
   onSelectCrumb(folder:Ifolder, event: Event, level:number){
-    let i= 1;
-    for (let crumb of this.breadcrumbsArr ) {
-      if (crumb.id === folder.id){
-        break;
-      }
-      else {
-        i++;
-      }
-    }
-    level = i;
-    this.FolderService.folderBreadcrumbs(level,0,[],folder);
-    this.FolderService.folderSelected(folder, event);
+    this.FolderService.selectCrumb(folder,event,level);
   }
 
   onInsert() {

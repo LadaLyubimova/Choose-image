@@ -4,6 +4,7 @@ import {NgForOf, NgIf} from "@angular/common";
 import {SelectedFolderDirective} from "../selected-folder.directive";
 import {SelectedSvgRotateDirective} from "../selected-svg-rotate.directive";
 import {FoldersService} from "../../../folders.service";
+import {ActivatedRoute, Params, Router} from "@angular/router";
 
 
 @Component({
@@ -26,7 +27,7 @@ export class FolderItemComponent implements OnInit {
   private countImage: number = 0;
 
 
-  constructor(private folderService: FoldersService, private elRef:ElementRef) {
+  constructor(private folderService: FoldersService, private router:Router, private activateRoute:ActivatedRoute) {
   }
 
   ngOnInit() {
@@ -47,16 +48,6 @@ export class FolderItemComponent implements OnInit {
       this.imageCounter(this.folderService.getFolderById(index), this.countImage)
     }
 
-
-
-    // for (let item of folder.items) {
-    //   if (item.type === 'image') {
-    //     this.countImage++;
-    //   } else {
-    //     this.imageCounter(item as unknown as Ifolder, this.countImage);
-    //   }
-    // }
-
     return this.countImage;
   }
 
@@ -67,18 +58,6 @@ export class FolderItemComponent implements OnInit {
     else {
       return false;
     }
-
-    // if (typeof (folderItems) === "object") {
-    // }
-    // for (let item of folderItems) {
-    //   if (item.type === 'folder') {
-    //     // console.log('Имя подпапки ' + item.name + ' Итерация: ' + this.i)
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // }
-    // return false;
   }
 
   writeSubFoldersInArray(folder: Ifolder) {
@@ -87,20 +66,13 @@ export class FolderItemComponent implements OnInit {
       arr.push(this.folderService.getFolderById(index));
     }
     return arr;
-
-    // let arr: Ifolder[] = [];
-    // for (let item of folder.items) {
-    //   if (item.type === 'folder') {
-    //     const folderItem = item as unknown as Ifolder;
-    //       arr.push({name: folderItem.name, type: folderItem.type, items: folderItem.items, subFolders: folderItem.subFolders, id: folderItem.id});
-    //   }
-    // }
-    // return arr;
   }
 
 
   onSelected(folder: Ifolder, event: Event) {
-    this.folderService.folderBreadcrumbs(this.level,0,[],folder);
+    const queryParams:Params = {folder: folder.id, level: this.level, event:event as Event};
+    this.router.navigate([],{relativeTo: this.activateRoute, queryParams, queryParamsHandling:"merge"});
+    // this.folderService.folderBreadcrumbs(this.level,0,[],folder);
     //Adding deleting classes
 
     //Opening and closing subfolders and select folder
@@ -111,7 +83,7 @@ export class FolderItemComponent implements OnInit {
         // alert('Папка открыта? ' + this.subFoldersOpen);
       }
       if ((event.target as HTMLElement).tagName === 'BUTTON') {
-        this.folderService.folderSelected(folder, event);
+        this.folderService.folderSelected(folder, event, this.level);
       }
     } else {
       console.log("Error: type not " + typeof (this.folder) + ' type is ' + folder.type)
