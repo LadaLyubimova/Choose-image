@@ -10,5 +10,5 @@ export interface Ifolder {
   name: string;
   type: string;
   items: Iimage[];
-  subFolders: string[]
+  path: string;
 }

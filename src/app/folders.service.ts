@@ -1,7 +1,6 @@
-import {ElementRef, HostListener, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Ifolder} from "../structure";
 import {BehaviorSubject} from 'rxjs';
-import {error} from "@angular/compiler-cli/src/transformers/util";
 import {ActivatedRoute, Params, Router} from "@angular/router";
 
 
@@ -10,91 +9,125 @@ import {ActivatedRoute, Params, Router} from "@angular/router";
 })
 export class FoldersService {
 
-  constructor(private router:Router, private activateRoute:ActivatedRoute) {
-  }
+  dummyFolder:Ifolder={id: '1', name: '', type: '', items: [], path: ''}
   clickedElement!: HTMLElement;
   breadcrumbsArr:Ifolder[] = [];
-  private selectedFolderSubject = new BehaviorSubject<Ifolder>({id: '1', subFolders: [], name: '', type: '', items: []});
+  private selectedFolderSubject = new BehaviorSubject<Ifolder>(this.dummyFolder);
   selectedFolder$ = this.selectedFolderSubject.asObservable();
   private breadcrumbsArrSubject = new BehaviorSubject<Ifolder[]>(this.breadcrumbsArr);
   breadcrumbsArr$ = this.breadcrumbsArrSubject.asObservable();
-  currentFolder: Ifolder = {id: this.selectedFolderSubject.value.id, subFolders: [], name: this.selectedFolderSubject.value.name, type: '', items: []};
+  currentFolder: Ifolder = {id: this.selectedFolderSubject.value.id, name: this.selectedFolderSubject.value.name, type: '', items: [], path: ''};
 
+  constructor(private router:Router, private activateRoute:ActivatedRoute) {
+  }
 
-  folderSelected(folder: Ifolder,  event: Event = new Event(''), level:number) {
+  folderSelected(folder: Ifolder,  event: Event = new Event('')) {
+    if (event.type === 'queryParams' && event.target=== null) {
+      this.setCurrentFolder(folder);
+    }
+    if (event.target)
+    {
+      if (((event.target) as HTMLElement).tagName === 'P') {
+        console.log('crumb');
+        this.redirectionToFolderPath(folder);
+        this.setCurrentFolder(folder);
+      }
+    }
+    this.setClasses();
+  }
 
-    // console.log(queryParams);
-
-    // localStorage.setItem('selectFolder', JSON.stringify(folder));
-    // localStorage.setItem('selectEvent', JSON.stringify(event));
-    // localStorage.setItem('crumbLevel', JSON.stringify(level));
-    this.folderBreadcrumbs(level,0,[],folder);
+  setCurrentFolder(folder: Ifolder) {
+    this.currentFolder = folder;
+    this.folderBreadcrumbs(folder);
     this.selectedFolderSubject.next(folder);
     this.breadcrumbsArrSubject.next(this.breadcrumbsArr);
-    this.currentFolder = folder;
+    // this.setClasses();
 
-    if (event.target){
-      if ((event.target as HTMLElement).tagName === 'P' || 'BUTTON') {
-        let el: HTMLElement = document.getElementById(this.currentFolder.id) as HTMLElement;
-        el.classList.add('select');
-        if (this.clickedElement && this.clickedElement !== el) {
-          this.clickedElement.classList.remove('select');
-        }
-        this.clickedElement = el;
+  }
+
+  setClasses() {
+    if (typeof document !== 'undefined'){
+      let el: HTMLElement = document.getElementById(this.currentFolder.id) as HTMLElement;
+      el.classList.add('select');
+      if (this.clickedElement && this.clickedElement !== el) {
+        this.clickedElement.classList.remove('select');
       }
+      if (this.clickedElement && this.clickedElement === el) {
+        this.clickedElement.classList.add('select');
+      }
+      this.clickedElement =  el;
     }
   }
 
   getFolders() {
-    let fold:Ifolder = this.getFolderById('root');
-    let arrFolders:Ifolder[] = [];
-    fold.subFolders.forEach((folder, index) =>
-      {
-        arrFolders.push(this.getFolderById(folder));
+    let folder:Ifolder = this.getFolderByPath('/');
+    let arrSub:Ifolder[] =[];
+    this.folders.forEach((fold)=> {
+      let path = fold.path.slice(0, -(fold.name).length)
+      // console.log(path);
+      if (path === folder.path) {
+        arrSub.push(fold);
       }
-    );
-    return arrFolders;
+    })
+    return arrSub;
   }
 
-  getFolderById(id:string) {
-  let folder: Ifolder = {id: '', name: '', subFolders: [], items: [], type: 'folder'};
+  redirectionToFolderPath (folder:Ifolder) {
+    const queryParams:Params = {path: folder.path};
+    this.router.navigate([],{relativeTo: this.activateRoute, queryParams, queryParamsHandling:"merge"})
+  }
+
+  getFolderByPath(path: string) {
+    let folder!:Ifolder;
+      for (let fold of this.folders){
+        if(fold.path === path) {
+          folder = fold;
+        }
+      }
+    return folder? folder : this.dummyFolder;
+  }
+
+  getSubFolders (folder:Ifolder) {
+    let arrSub:Ifolder[] =[];
+    this.folders.forEach((fold)=> {
+      let len = fold.name.length;
+      let parentPath = fold.path.slice(0, -len - 1);
+      if (folder.path === parentPath) {
+        arrSub.push(fold);
+      }
+    })
+    return arrSub;
+}
+
+  folderBreadcrumbs(folder:Ifolder){
+    this.breadcrumbsArr = [];
+    let pathArr:string = '';
+    const arrFoldersFromPath = folder.path.split('/');
+    arrFoldersFromPath.forEach((fold, index)=>{
+      pathArr =pathArr + '/' + arrFoldersFromPath[index] ;
+      // console.log(pathArr);
+      this.breadcrumbsArr.push( this.getFolderByNameAndPath(fold, pathArr.slice(2, pathArr.length)));
+    });
+    this.breadcrumbsArr = this.breadcrumbsArr.slice(1,this.breadcrumbsArr.length);
+  }
+
+  getFolderByNameAndPath(name:string, path:string) {
+    path = '/' + path;
+    // console.log(path);
+    let folder: Ifolder = this.dummyFolder;
     for (let fold of this.folders){
-      if(fold.id === id) {
+      if(fold.name === name && fold.path === path) {
+        // console.log(path);
         folder = fold;
+        return folder;
       }
     }
     return folder;
   }
 
-  folderBreadcrumbs(level:number, counter:number=0, arr:Ifolder[] = [], folder:Ifolder){
-      for (let fold of this.folders) {
-        for (let subFold of fold.subFolders) {
-          if (subFold === folder.id) {
-            counter ++;
-            arr.push(fold);
-            if (counter < level) {
-            this.folderBreadcrumbs(level, counter, arr, fold)
-            }
-          }
-        }
-      }
-      arr.push(folder);
-      this.breadcrumbsArr = arr.slice(level,arr.length);
-  }
-
-  selectCrumb (folder:Ifolder, event: Event = new Event(''), level:number) {
-    let i= 1;
-    for (let crumb of this.breadcrumbsArr ) {
-      if (crumb.id === folder.id){
-        break;
-      }
-      else {
-        i++;
-      }
-    }
-    level = i;
-    this.folderBreadcrumbs(level,0,[],folder);
-    this.folderSelected( folder, event, level);
+  selectCrumb (folder:Ifolder, event: Event = new Event('crumbs')) {
+    this.folderBreadcrumbs(folder);
+    this.folderSelected( folder, event);
   }
 
 
@@ -104,14 +137,14 @@ export class FoldersService {
       id: 'root',
       name: 'root',
       type: 'folder',
-      subFolders: ['1','5','6','9','10','11'],
-      items: []
+      items: [],
+      path: '/'
     },
     {
       id: '1',
       name: "Abstract",
       type: "folder",
-      subFolders: [],
+      path: '/Abstract',
       items: [
         {
           name: "Abstract_1",
@@ -242,9 +275,9 @@ export class FoldersService {
     },
     {
       id: '2',
-      subFolders: ['3'],
       name: "Cats",
       type: "folder",
+      path: '/Animals/Cats',
       items: [
         {
           name: "Cat_1",
@@ -325,9 +358,9 @@ export class FoldersService {
     },
     {
       id: '3',
-      subFolders: [],
-      name: "Animals",
+      name: "Animals2",
       type: "folder",
+      path: '/Animals/Cats/Animals2',
       items: [
         {
           name: "Cat_1",
@@ -363,9 +396,9 @@ export class FoldersService {
     },
     {
       id: '4',
-      subFolders: [],
       name: "Dogs",
       type: "folder",
+      path: '/Animals/Dogs',
       items: [
         {
           name: "Dog_1",
@@ -396,23 +429,23 @@ export class FoldersService {
     },
     {
       id: '5',
-      subFolders: ['4', '2'],
       name: "Animals",
       type: "folder",
+      path: '/Animals',
       items: [],
     },
     {
       id: '6',
-      subFolders: ['7','8'],
       name: "Food",
       type: "folder",
+      path: '/Food',
       items: [],
     },
     {
       id: '7',
-      subFolders: [],
       name: "Sweet",
       type: "folder",
+      path: '/Food/Sweet',
       items: [
         {
           name: "Sweet_1",
@@ -473,9 +506,9 @@ export class FoldersService {
     },
     {
       id: '8',
-      subFolders: [],
       name: "Not sweet",
       type: "folder",
+      path: '/Food/Not sweet',
       items: [
         {
           name: "Not_sweet_1",
@@ -536,16 +569,16 @@ export class FoldersService {
     },
     {
       id: '9',
-      subFolders: [],
       name: "Interiors",
       type: "folder",
+      path: '/Interiors',
       items: [], // Здесь пока нет элементов
     },
     {
       id: '10',
-      subFolders: [],
       name: "Plants",
       type: "folder",
+      path: '/Plants',
       items: [
         {
           name: "Plants_1",
@@ -576,9 +609,9 @@ export class FoldersService {
     },
     {
       id: '11',
-      subFolders: [],
       name: "Space",
       type: "folder",
+      path: '/Space',
       items: [
         {
           name: "Space_1",

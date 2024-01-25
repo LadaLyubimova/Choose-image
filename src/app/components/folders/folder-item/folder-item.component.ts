@@ -44,15 +44,17 @@ export class FolderItemComponent implements OnInit {
           this.imageCounter(item as unknown as Ifolder, this.countImage);
         }
       }
-    for (let index of folder.subFolders) {
-      this.imageCounter(this.folderService.getFolderById(index), this.countImage)
-    }
+    let subfolders = this.folderService.getSubFolders(folder);
+    subfolders.forEach((fold) => {
+      this.imageCounter(fold,this.countImage)
+      }
+    )
 
     return this.countImage;
   }
 
   subfolderCheck(folder:Ifolder) {
-    if (folder.subFolders.length >= 1){
+    if (this.folderService.getSubFolders(folder).length >= 1){
       return true;
     }
     else {
@@ -62,37 +64,34 @@ export class FolderItemComponent implements OnInit {
 
   writeSubFoldersInArray(folder: Ifolder) {
     let arr: Ifolder[] = [];
-    for (let index of folder.subFolders) {
-      arr.push(this.folderService.getFolderById(index));
-    }
+    let subfolders = this.folderService.getSubFolders(folder);
+    subfolders.forEach((fold)=>{
+      arr.push(fold);
+    })
+
+    // for (let index of folder.subFolders) {
+    //   arr.push(this.folderService.getFolderById(index));
+    // }
     return arr;
   }
 
 
   onSelected(folder: Ifolder, event: Event) {
-    const queryParams:Params = {folder: folder.id, level: this.level, event:event as Event};
-    this.router.navigate([],{relativeTo: this.activateRoute, queryParams, queryParamsHandling:"merge"});
-    // this.folderService.folderBreadcrumbs(this.level,0,[],folder);
-    //Adding deleting classes
+    console.log(event);
+    if ((event.target as HTMLElement).tagName === 'BUTTON' || (event.target as HTMLElement).tagName === 'P' || (event.target as HTMLElement).id === "icon-folder")
+     {
+       this.folderService.redirectionToFolderPath(folder);
+       this.folderService.folderSelected(folder, event);
 
-    //Opening and closing subfolders and select folder
-
+    }
     if (folder.type === 'folder') {
       if (this.subFoldersOpen) {
         this.items = this.writeSubFoldersInArray(folder);
-        // alert('Папка открыта? ' + this.subFoldersOpen);
-      }
-      if ((event.target as HTMLElement).tagName === 'BUTTON') {
-        this.folderService.folderSelected(folder, event, this.level);
+        this.folderService.redirectionToFolderPath(folder);
       }
     } else {
       console.log("Error: type not " + typeof (this.folder) + ' type is ' + folder.type)
     }
-
-  }
-
-  itemsCheck(folder: Ifolder){
-    return folder.items !== undefined;
 
   }
 }

@@ -19,7 +19,7 @@ import {ImagesService} from "../../images.service";
   styleUrl: './images.component.less'
 })
 export class ImagesComponent implements OnDestroy {
-  folder: Ifolder = {id: '1', subFolders: [], name: '', type: '', items: []};
+  folder: Ifolder = {id: '1', name: '', type: '', items: [], path: ''};
   images$:Observable<Iimage[]> = this.folderService.selectedFolder$.pipe(map(value =>this.getImages(value)))
   private folderSubscription!: Subscription;
 
@@ -51,9 +51,14 @@ export class ImagesComponent implements OnDestroy {
         images.push(item);
       }
     }
-    for (let index of (folder as Ifolder).subFolders){
-      this.getImages(this.folderService.getFolderById(index), images)
-    }
+    let subfolders = this.folderService.getSubFolders(folder as Ifolder);
+    subfolders.forEach(fold => {
+      this.getImages(fold, images)
+    });
+
+    // for (let index of (folder as Ifolder).subFolders){
+    //   this.getImages(this.folderService.getFolderById(index), images)
+    // }
     }
     return images;
   }

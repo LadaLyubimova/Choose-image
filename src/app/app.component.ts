@@ -1,10 +1,10 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {ActivatedRoute, Router, RouterOutlet} from '@angular/router';
+import {ActivatedRoute, Params, Router, RouterOutlet} from '@angular/router';
 import {WhiteBoxComponent} from "./components/white-box/white-box.component";
-import {ImagesService} from "./images.service";
 import {FoldersService} from "./folders.service";
 import {Ifolder} from "../structure";
+import {filter, of, Subscription} from "rxjs";
 
 @Component({
   selector: 'app-root',
@@ -13,48 +13,27 @@ import {Ifolder} from "../structure";
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit, OnDestroy{
   title = 'Choose-image';
-
-  folderJSON!:Ifolder;
-  eventJSON!:Event;
-  crumbLevel!:number;
+  path!: string;
+  sub!:Subscription;
   constructor(private folderService:FoldersService, private router:Router, private activeRoute: ActivatedRoute) {
   }
 
   ngOnInit() {
-    // if (typeof window !== 'undefined'){
-    //   this.getDataFromLocalStorage();
-    //   this.folderService.folderSelected(this.folderJSON, this.eventJSON, this.crumbLevel);
-    //   this.folderService.selectCrumb(this.folderJSON,this.eventJSON,this.crumbLevel)
-    // }
-    this.activeRoute.queryParams.subscribe(
-      queryParams => {
-        this.folderJSON = this.folderService.getFolderById(queryParams['folder']);
-        this.eventJSON = queryParams['event'];
-        this.crumbLevel = queryParams['level'];
-        this.folderService.folderSelected(this.folderJSON, this.eventJSON, this.crumbLevel);
-        this.folderService.selectCrumb(this.folderJSON,this.eventJSON,this.crumbLevel);
-      }
-    )
+      this.sub = this.activeRoute.queryParams.pipe(filter(queryParams => queryParams['path'] !== ''))
+        .subscribe((queryParams) =>
+          {
+            this.path = queryParams['path'];
+            this.folderService.getFolderByPath(queryParams['path']);
+            let folderFromPath = this.folderService.getFolderByPath(queryParams['path']);
+            this.folderService.folderSelected(folderFromPath, new Event('queryParams'));
+            this.folderService.setClasses();
+          }
+      )
   }
 
-  getDataFromUrl() {
-
-}
-
-  // getDataFromLocalStorage() {
-  //
-  //   let folder = localStorage.getItem('selectFolder');
-  //   let event = localStorage.getItem('selectEvent');
-  //   let level = localStorage.getItem('crumbLevel');
-  //
-  //   if (typeof (folder) === "string" && typeof (event) === "string" && typeof (level) === "string") {
-  //     this.folderJSON = JSON.parse(folder);
-  //     this.eventJSON = JSON.parse(event);
-  //     this.crumbLevel = JSON.parse(level) as number;
-  //   }
-  // }
-
-
+  ngOnDestroy() {
+    this.sub.unsubscribe();
+  }
 }

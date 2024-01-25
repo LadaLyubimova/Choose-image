@@ -47,7 +47,7 @@ export class WhiteBoxComponent implements OnDestroy{
   }
 
   onSelectCrumb(folder:Ifolder, event: Event, level:number){
-    this.FolderService.selectCrumb(folder,event,level);
+    this.FolderService.selectCrumb(folder,event);
   }
 
   onInsert() {
