@@ -77,7 +77,7 @@ export class FolderItemComponent implements OnInit {
 
 
   onSelected(folder: Ifolder, event: Event) {
-    console.log(event);
+    // console.log(event);
     if ((event.target as HTMLElement).tagName === 'BUTTON' || (event.target as HTMLElement).tagName === 'P' || (event.target as HTMLElement).id === "icon-folder")
      {
        this.folderService.redirectionToFolderPath(folder);

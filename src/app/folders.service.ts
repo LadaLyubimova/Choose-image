@@ -42,7 +42,6 @@ export class FoldersService {
     this.selectedFolderSubject.next(folder);
     this.breadcrumbsArrSubject.next(this.breadcrumbsArr);
     // this.setClasses();
-
   }
 
   setClasses() {
