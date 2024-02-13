@@ -1,9 +1,9 @@
 import {Component, Input, OnDestroy} from '@angular/core';
 import {FoldersComponent} from "../folders/folders.component";
 import {ImagesComponent} from "../images/images.component";
-import {Ifolder, Iimage} from "../../../structure";
+import {entity, folder, Ifolder} from "../../../structure";
 import {ImagesService} from "../../images.service";
-import {map, Subscription} from "rxjs";
+import {Subscription} from "rxjs";
 import {NgClass, NgForOf} from "@angular/common";
 import {FoldersService} from "../../folders.service";
 
@@ -21,37 +21,31 @@ import {FoldersService} from "../../folders.service";
 })
 export class WhiteBoxComponent implements OnDestroy{
   @Input() selectedFolder!: Ifolder;
-  private imageSubscription!: Subscription;
-  private imageSelectSubscription!: Subscription;
-  private breadcrumbsSelectSubscription!: Subscription;
-  image!:Iimage;
+  private sub!:Subscription;
+  image!:entity|undefined;
   imageSelect!:boolean;
-  breadcrumbsArr!:Ifolder[];
+  breadcrumbsArr!:folder[];
 
-  constructor(private ImagesService: ImagesService, public FolderService:FoldersService) {
-    this.imageSubscription = this.ImagesService.selectedItem$.subscribe((value) => {
-      this.image = value;
+  constructor(private imagesService: ImagesService, public folderService:FoldersService) {
+    this.sub = this.imagesService.selectedImage$.subscribe((value) => {
+        this.image = value;
+        this.imageSelect = this.image !== undefined;
     });
-    this.imageSelectSubscription = this.ImagesService.selectedImage$.subscribe((value) => {
-      this.imageSelect = value;
-    });
-    this.breadcrumbsSelectSubscription = this.FolderService.breadcrumbsArr$.subscribe((value) => {
+    this.sub = this.folderService.breadcrumbsArr$.subscribe((value) => {
       this.breadcrumbsArr = value;
     });
   }
 
   ngOnDestroy() {
-    this.imageSubscription.unsubscribe();
-    this.imageSelectSubscription.unsubscribe();
-    this.breadcrumbsSelectSubscription.unsubscribe();
+    this.sub.unsubscribe();
   }
 
-  onSelectCrumb(folder:Ifolder, event: Event, level:number){
-    this.FolderService.selectCrumb(folder,event);
+  onSelectCrumb(folder:folder){
+    this.folderService.selectCrumb(folder);
   }
 
   onInsert() {
-    if (this.imageSelect) {
+    if (this.image !== undefined) {
       alert('Image: ' + this.image.name);
     }
     else {

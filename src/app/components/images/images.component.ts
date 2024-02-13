@@ -1,7 +1,7 @@
-import {Component, ElementRef, HostListener, OnDestroy} from '@angular/core';
+import {Component, HostListener, OnDestroy} from '@angular/core';
 import {FoldersService} from "../../folders.service";
-import {Ifolder, Iimage} from "../../../structure";
-import {map, Observable, Subscription} from 'rxjs';
+import {entity, folder} from "../../../structure";
+import {Subscription} from 'rxjs';
 import {ImageItemComponent} from "./image-item/image-item.component";
 import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {ImagesService} from "../../images.service";
@@ -19,51 +19,33 @@ import {ImagesService} from "../../images.service";
   styleUrl: './images.component.less'
 })
 export class ImagesComponent implements OnDestroy {
-  folder: Ifolder = {id: '1', name: '', type: '', items: [], path: ''};
-  images$:Observable<Iimage[]> = this.folderService.selectedFolder$.pipe(map(value =>this.getImages(value)))
-  private folderSubscription!: Subscription;
+  folder: folder = {
+    customFields: {},
+    hasChildren: false,
+    id: '1',
+    lastModified: '',
+    name: 'Folder',
+    ownerId: '1',
+    path: '/',
+    private: false,
+  };
+  private subscription!: Subscription;
+  images: entity[] = []
 
-  constructor( public folderService: FoldersService, private imgService:ImagesService, private elRef: ElementRef,) {
-    this.folderSubscription = this.folderService.selectedFolder$.subscribe((value) => {
-      this.folder = value;
-      this.getImages(this.folder);
+  constructor(public folderService: FoldersService, private imgService: ImagesService) {
+    this.subscription = this.folderService.entities$.subscribe(value => {
+      this.images = value;
     });
   }
 
-  @HostListener('click', ['$event']) click(event:Event) {
+  @HostListener('click', ['$event']) click(event: Event) {
     const targetElement = event.target as HTMLElement;
-    if (targetElement.classList.contains('image')) {
-      // console.log('Это картинка!');
-      this.imgService.setImageSelect(true);
+    if (!targetElement.classList.contains('image')) {
+      this.imgService.selectedImage.next(undefined);
     }
-    else {
-      this.imgService.setImageSelect(false);
-      // console.log('Это не картинка!');
-    }
-
   };
 
-  getImages(folder: Ifolder | null, currentImages: any[] = []) {
-    let images = currentImages;
-    if (typeof (folder) !== null){
-    for (let item of (folder as Ifolder).items ) {
-      if (item.type === 'image') {
-        images.push(item);
-      }
-    }
-    let subfolders = this.folderService.getSubFolders(folder as Ifolder);
-    subfolders.forEach(fold => {
-      this.getImages(fold, images)
-    });
-
-    // for (let index of (folder as Ifolder).subFolders){
-    //   this.getImages(this.folderService.getFolderById(index), images)
-    // }
-    }
-    return images;
-  }
-
   ngOnDestroy() {
-    this.folderSubscription.unsubscribe();
+    this.subscription.unsubscribe();
   }
 }

@@ -1,63 +1,65 @@
-import {
-  Component,
-  ElementRef,
-  Input,
-  ViewChild,
-  AfterViewChecked,
-  HostListener, OnDestroy, OnInit
-} from '@angular/core';
-import {Iimage} from "../../../../structure";
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {entity} from "../../../../structure";
 import {SelectedImageDirective} from "../selected-image.directive";
 import {ImagesService} from "../../../images.service";
-import {NgClass, NgIf} from "@angular/common";
+import {AsyncPipe, NgClass, NgIf, NgOptimizedImage} from "@angular/common";
 import {Subscription} from "rxjs";
+import {HttpClient} from "@angular/common/http";
+import {PreviewUrlPipe} from "../../../shared/preview-url.pipe";
+import {GetImagePipe} from "../../../shared/get-image.pipe";
 
 @Component({
-  selector: 'app-image-item',
-  standalone: true,
-  imports: [
-    SelectedImageDirective,
-    NgIf,
-    NgClass
-  ],
-  templateUrl: './image-item.component.html',
-  styleUrl: './image-item.component.less'
+    selector: 'app-image-item',
+    standalone: true,
+    imports: [
+        SelectedImageDirective,
+        NgIf,
+        NgClass,
+        AsyncPipe,
+        NgOptimizedImage,
+        PreviewUrlPipe,
+        GetImagePipe
+    ],
+    templateUrl: './image-item.component.html',
+    styleUrl: './image-item.component.less'
 })
-export class ImageItemComponent implements OnInit {
-  @Input() image!: Iimage;
-  imageSelect: boolean = false;
-  currentImage!: Iimage;
-  imageSelectSubscription!: Subscription;
-  currentImageSubscription!: Subscription;
-  currentSelected!: boolean;
-  constructor(private ImagesService: ImagesService) {
-    this.imageSelectSubscription = this.ImagesService.selectedImage$.subscribe((value) => {
-      this.currentSelected = value;
-      this.imageSelect = this.isSelected();
-    });
-    this.currentImageSubscription = this.ImagesService.selectedItem$.subscribe((value) => {
-      this.currentImage = value;
-      this.imageSelect = this.isSelected();
-    });
-  }
+export class ImageItemComponent implements OnInit, OnDestroy {
+    @Input() image!: entity;
+    imageSelect: boolean = false;
+    imageSelectSubscription!: Subscription;
+    sub!: Subscription;
+    src!: boolean;
+    isLoading: boolean = true;
 
-  ngOnInit() {
-
-  }
-
-  imageWasSelect(image: Iimage, event: Event) {
-    this.ImagesService.imageSelected(image);
-
-  }
-
-  isSelected() {
-    if (this.currentImage === this.image && this.currentSelected) {
-      // console.log(this.currentImage === this.image);
-      // console.log(this.image);
-      // console.log(this.currentImage);
-      return true;
-    } else {
-      return false;
+    constructor(private imagesService: ImagesService, private http: HttpClient) {
     }
-  }
+
+    ngOnInit() {
+        this.imagesService.srcLoad$.subscribe(value => {
+            this.src = value;
+        });
+        this.imageSelectSubscription = this.imagesService.selectedImage$
+            .subscribe((value) => {
+                if (value) {
+                    this.imageSelect = value.id === this.image.id;
+                } else if (value === undefined) {
+                    this.imageSelect = false;
+                }
+            });
+    }
+
+    hideLoader() {
+        this.isLoading = false;
+    }
+
+    imageWasSelect(image: entity, event: Event) {
+        this.imagesService.imageSelected(image);
+    }
+
+
+    ngOnDestroy() {
+        if (this.sub) {
+            this.sub.unsubscribe();
+        }
+    }
 }

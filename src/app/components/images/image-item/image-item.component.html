@@ -1,6 +1,11 @@
 <div class="image-block">
-  <button [ngClass]="{'select-image':imageSelect}" (click)="imageWasSelect(image, $event)" id="image-button" #imageButton  class="image-button">
-    <img class="image" alt="{{image.name}}" src="{{image.url}}">
+  <button id="{{image.id}}" (click)="imageWasSelect(image, $event)" [ngClass]="{'select': imageSelect}" #imageButton  class="image-button">
+    <img class="image" alt="{{image.name}}" *ngIf="(image | previewUrl | getImage | async) as imageUrl; else load" [src]="imageUrl" (load)="hideLoader()">
   </button>
   {{image.name}}
+  <ng-template #load>
+    <div class="image">
+      <img alt="placeholder" style="width: 40px; height: 40px" src="assets/media/preloader.gif">
+    </div>
+  </ng-template>
 </div>

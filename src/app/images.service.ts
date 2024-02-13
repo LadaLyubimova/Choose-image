@@ -1,24 +1,18 @@
-import {ElementRef, Injectable} from '@angular/core';
-import {BehaviorSubject} from "rxjs";
-import {Iimage} from "../structure";
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable, Subject} from "rxjs";
+import {entity} from "../structure";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImagesService {
-  private selectedItemSubject = new BehaviorSubject<Iimage>({name: '',type: '', url: ''});
-  selectedItem$ = this.selectedItemSubject.asObservable();
-  private selectedImageSubject = new BehaviorSubject<boolean>(false);
-  selectedImage$ = this.selectedImageSubject.asObservable();
-  clickedElement!:HTMLElement;
+  selectedImage:Subject<entity|undefined> = new Subject();
+  selectedImage$ = this.selectedImage.asObservable();
+  srcLoadSubject:BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  srcLoad$:Observable<boolean> = this.srcLoadSubject.asObservable();
 
-  imageSelected(image:Iimage){
-    this.selectedItemSubject.next(image);
-  }
-
-  setImageSelect(bool:boolean) {
-    // console.log(bool);
-    this.selectedImageSubject.next(bool);
+  imageSelected(image:entity){
+    this.selectedImage.next(image)
   }
 
   constructor() { }

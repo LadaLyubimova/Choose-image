@@ -1,10 +1,10 @@
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Ifolder, Iimage} from "../../../../structure";
-import {NgForOf, NgIf} from "@angular/common";
+import {Component, Input, OnInit} from '@angular/core';
+import {folder} from "../../../../structure";
+import {AsyncPipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {SelectedFolderDirective} from "../selected-folder.directive";
 import {SelectedSvgRotateDirective} from "../selected-svg-rotate.directive";
 import {FoldersService} from "../../../folders.service";
-import {ActivatedRoute, Params, Router} from "@angular/router";
+import {map, Observable, take} from "rxjs";
 
 
 @Component({
@@ -14,84 +14,54 @@ import {ActivatedRoute, Params, Router} from "@angular/router";
     NgIf,
     NgForOf,
     SelectedFolderDirective,
-    SelectedSvgRotateDirective
+    SelectedSvgRotateDirective,
+    AsyncPipe,
+    NgClass
   ],
   templateUrl: './folder-item.component.html',
   styleUrl: './folder-item.component.less'
 })
 export class FolderItemComponent implements OnInit {
-  @Input() folder!: Ifolder;
-  @Input() level:number = 0;
-  items: Ifolder[] = [];
+  @Input() folder!: folder;
+  @Input() level: number = 0;
+  items!: Observable<folder[]>;
   subFoldersOpen: boolean = false;
-  private countImage: number = 0;
+  countImages: Observable<number> = new Observable<number>();
+  folderSelect: boolean = false;
 
 
-  constructor(private folderService: FoldersService, private router:Router, private activateRoute:ActivatedRoute) {
+  constructor(private folderService: FoldersService) {
+    this.folderService.selectedFolder$.subscribe(
+        value => {
+          this.folderSelect = value.id === this.folder.id;
+          if (value.id === this.folder.id) {
+            this.folderService.redirectionToFolderPath(this.folder);
+            this.folderService.pushBreadcrumbsInArray(this.folder);
+          }
+        }
+    )
   }
 
   ngOnInit() {
     this.level++;
+    this.imageCounter(this.folder);
+    this.items = this.folderService.getSubFolders(this.folder.path + this.folder.name + '/');
+    this.items.subscribe(value => {
+      this.folderService.foldersNew.push(...value);
+    });
   }
 
-  imageCounter(folder: Ifolder, currentCount: number = 0): number {
-    this.countImage = currentCount;
-    for (let item of folder.items) {
-        if (item.type === 'image') {
-          this.countImage++;
-        }
-        else {
-          this.imageCounter(item as unknown as Ifolder, this.countImage);
-        }
-      }
-    let subfolders = this.folderService.getSubFolders(folder);
-    subfolders.forEach((fold) => {
-      this.imageCounter(fold,this.countImage)
-      }
-    )
-
-    return this.countImage;
+  onSelected() {
+      this.folderService.selectedFolderSubject.next(this.folder);
   }
 
-  subfolderCheck(folder:Ifolder) {
-    if (this.folderService.getSubFolders(folder).length >= 1){
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-  writeSubFoldersInArray(folder: Ifolder) {
-    let arr: Ifolder[] = [];
-    let subfolders = this.folderService.getSubFolders(folder);
-    subfolders.forEach((fold)=>{
-      arr.push(fold);
-    })
-
-    // for (let index of folder.subFolders) {
-    //   arr.push(this.folderService.getFolderById(index));
-    // }
-    return arr;
-  }
-
-
-  onSelected(folder: Ifolder, event: Event) {
-    // console.log(event);
-    if ((event.target as HTMLElement).tagName === 'BUTTON' || (event.target as HTMLElement).tagName === 'P' || (event.target as HTMLElement).id === "icon-folder")
-     {
-       this.folderService.redirectionToFolderPath(folder);
-       this.folderService.folderSelected(folder, event);
-
-    }
-    if (folder.type === 'folder') {
-      if (this.subFoldersOpen) {
-        this.items = this.writeSubFoldersInArray(folder);
-        this.folderService.redirectionToFolderPath(folder);
-      }
-    } else {
-      console.log("Error: type not " + typeof (this.folder) + ' type is ' + folder.type)
-    }
-
+  imageCounter(folder: folder) {
+    this.countImages = this.folderService.getFolders(folder.path + folder.name + '/').pipe(
+      take(1),
+      map(
+        (obj) =>
+          obj.entitiesCount
+      ));
+    return this.countImages;
   }
 }

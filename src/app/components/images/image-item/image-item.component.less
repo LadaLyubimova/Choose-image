@@ -1,3 +1,10 @@
+.picture-block {
+  height: 145px;
+  width: 145px;
+  border-radius: 8px;
+  padding: 1px;
+}
+
 .image-block {
   display: flex;
   gap: 4px;
@@ -6,10 +13,10 @@
 }
 
 .image {
-  height: 145px;
-  width: 145px;
-  border-radius: 8px;
-  padding: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .picture-block();
   background: #F2F2F2;
 }
 
@@ -23,7 +30,7 @@
   border: 2px transparent solid;
 }
 
-.select-image {
+.select {
   border: 2px #2563EB solid;
   border-radius: 8px;
 }

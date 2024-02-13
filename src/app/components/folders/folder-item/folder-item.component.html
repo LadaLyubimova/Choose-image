@@ -1,8 +1,8 @@
 <div class="folder-buttons">
-  <div class="one-folder-button">
-    <button appSelectedFolder #folderButton (click)="onSelected(folder, $event)" class="folder" id="{{folder.id}}">
-      <div *ngIf="subfolderCheck(folder); else noChevrone">
-      <div appSelectedSvgRotate (click)="subFoldersOpen = !subFoldersOpen;" *ngIf="subfolderCheck(folder); else noChevrone">
+  <div  class="one-folder-button">
+    <button [ngClass]="{'select':folderSelect}" #folderButton (click)="onSelected()" class="folder" id="{{folder.id}}">
+      <div *ngIf="folder.hasChildren; else noChevrone">
+      <div appSelectedSvgRotate (click)="subFoldersOpen = !subFoldersOpen;" *ngIf="folder.hasChildren; else noChevrone">
           <svg class="icon icon-chevron">
             <use xlink:href="/assets/sprites/sprite.svg#icon-chevron"></use>
           </svg>
@@ -14,10 +14,10 @@
       <svg class="icon icon-folder">
         <use id="icon-folder" xlink:href="/assets/sprites/sprite.svg#icon-folder"></use>
       </svg>
-      {{folder.name}} ({{imageCounter(folder)}})
+      {{folder.name}} ({{countImages|async}})
     </button>
     <div class="subfolders" *ngIf="subFoldersOpen">
-          <app-folder-item *ngFor="let folder of items" [folder]="folder" [level]="level">
+          <app-folder-item *ngFor="let folder of items|async" [folder]="folder" [level]="level">
           </app-folder-item>
     </div>
   </div>
